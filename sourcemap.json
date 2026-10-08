@@ -1,0 +1,1 @@
+{"name":"typedevent","className":"ModuleScript","filePaths":["src\\init.luau","default.project.json"],"children":[{"name":"Types","className":"ModuleScript","filePaths":["src\\Types.luau"]}]}
