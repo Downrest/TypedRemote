@@ -105,6 +105,18 @@ export type ServerListener<
 	) -> RBXScriptConnection;
 }
 
+--[=[
+	@class Event
+]=]
+
+--[=[
+	@interface Event
+	@within Event
+
+	@field client { FireServer: () -> (), OnClientEvent: { Connect: (self: any, callback: (...any) -> ()) -> (), ConnectParallel: (self: any, callback: (...any) -> ()) -> (), Once: (self: any, callback: (...any) -> ()) -> () } } }
+	@field server { FireClient: () -> (), OnServerEvent: { Connect: (self: any, callback: (...any) -> ()) -> (), ConnectParallel: (self: any, callback: (...any) -> ()) -> (), Once: (self: any, callback: (...any) -> ()) -> () } } }
+]=]
+
 export type Event<
 	toClientSignature = DefaultSignature,
 	toServerSignature = DefaultSignature
@@ -156,6 +168,18 @@ export type ServerInvoke<
 		>
 	>
 }
+
+--[=[
+	@class Function
+]=]
+
+--[=[
+	@interface Function
+	@within Function
+
+	@field client { InvokeServer: (...any) -> (...any), OnClientInvoke: (...any) -> (...any) }
+	@field server { InvokeClient: (Player, ...any) -> (...any), OnServerInvoke: (Player, ...any) -> (...any) }
+]=]
 
 export type Function<
 	fromClientSignature = DefaultSignature,

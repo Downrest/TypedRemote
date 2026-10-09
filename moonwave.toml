@@ -2,8 +2,7 @@ title = "TypedRemote"
 gitRepoUrl = "https://github.com/Downrest/TypedRemote"
 
 gitSourceBranch = "main"
-changelog = true
-classOrder = []
+changelog = false
 
 [docusaurus]
 onBrokenLinks = "throw"
@@ -14,6 +13,14 @@ projectName = "TypedRemote"
 url = "https://downrest.github.io"
 baseUrl = "/TypedRemote"
 tagline = "Declare remote events and functions, and typecheck with function signatures () -> ()"
+
+[[classOrder]]
+classes = ["TypedRemote"]
+
+[[classOrder]]
+section = "types"
+collapsed = false
+classes = ["Event", "Function"]
 
 [home]
 enabled = true

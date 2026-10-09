@@ -1,8 +1,5 @@
 --[=[
 	@class TypedRemote
-
-	A typed wrapper for `RemoteEvent` and `RemoteFunction` instances, taking advantage of function types `() -> ()` 
-	for typechecking on firing, listening, and invoking.
 ]=]
 
 local RunService = game:GetService("RunService")
@@ -392,7 +389,7 @@ end
 
 	@within TypedRemote
 	@param remoteFunctionName string -- Name for Function object
-	@return Event<fromClientSignature, fromServerSignature> -- Function object
+	@return Function<fromClientSignature, fromServerSignature> -- Function object
 ]=]
 function TypedRemote.newFunction<
 	fromClientSignature,
@@ -428,7 +425,7 @@ end
 
 	@within TypedRemote
 	@param remoteFunction RemoteFunction -- RemoteFunction instance for Function object
-	@return Event<fromClientSignature, fromServerSignature> -- Function object
+	@return Function<fromClientSignature, fromServerSignature> -- Function object
 ]=]
 function TypedRemote.wrapFunction<
 	fromClientSignature,
