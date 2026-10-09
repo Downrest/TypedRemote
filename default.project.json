@@ -1,6 +1,22 @@
 {
-    "name": "typedevent",
-    "tree": {
-      "$path": "src"
+  "name": "TypedRemote",
+  "port": 8001,
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "TypedRemote": {
+        "$path": "src/"
+      },
+
+      "$path": "tests/shared/"
+    },
+    "ServerScriptService": {
+      "$path": "tests/server/"
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "$path": "tests/client/"
+      }
     }
   }
+}

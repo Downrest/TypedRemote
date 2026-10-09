@@ -2,109 +2,174 @@ local Types = {}
 
 export type DefaultSignature = () -> ()
 
-type function PushFrontSignature(append: type, signature: type): type
+type function AppendParameters(append: type, signature: type): type
+	if signature.tag == "unknown" then
+		signature = DefaultSignature
+	end
 	if signature.tag ~= "function" then
-		signature = types.newfunction()
+		print(`Argument signature must be a function`)
 	end
 
-	local typeParameters = signature:parameters()
+	local signatureParameters = signature:parameters(); do
+        local head = signatureParameters.head:: {type}
+        if not head then
+            head = {}
+            signatureParameters.head = head
+        end
+        
+        for index = #head, 1, -1 do
+            local value = head[index]
+            head[index+1] = value
+        end
+        head[1] = append
+    end
+	local signatureReturns = signature:returns()
 
-	if typeParameters.head then
-		for headIndex = #typeParameters.head, 1, -1 do
-			local headType = typeParameters.head[headIndex]
-			typeParameters.head[headIndex + 1] = headType
-		end
-		typeParameters.head[1] = append
-	else
-		typeParameters.head = {append}
+	return types.newfunction(signatureParameters, signatureReturns)
+end
+type function ExtractParameters(signature: type): type
+	if signature.tag == "unknown" then
+		signature = DefaultSignature
+	end
+	if signature.tag ~= "function" then
+		print(`Argument signature must be a function`)
 	end
 
-	return types.newfunction(typeParameters)
+	return types.newfunction(
+		signature:parameters()
+	)
 end
 
 --[[
-    RELIABLE REMOTE EVENTS
+ 	REMOTE EVENTS
 ]]
 
 export type ClientFire<
-	clientToServerSignature = DefaultSignature,
-	serverToClientSignature = DefaultSignature
-	> = {
-		FireServer: PushFrontSignature<
-		any,
-		clientToServerSignature
-		>;
-	}
+	self = any,
+	toClientSignature = DefaultSignature,
+	toServerSignature = DefaultSignature
+> = {
+	FireServer: AppendParameters<
+		self,
+		toClientSignature
+	>;
+}
 export type ClientListener<
-	clientToServerSignature = DefaultSignature,
-	serverToClientSignature = DefaultSignature
-	> = {
-		Connect: (
-			self: ClientListener<clientToServerSignature, serverToClientSignature>, 
-			callback: serverToClientSignature
-		) -> RBXScriptConnection;
-		ConnectParallel: (
-			self: ClientListener<clientToServerSignature, serverToClientSignature>, 
-			callback: serverToClientSignature
-		) -> RBXScriptConnection;
-		Once: (
-			self: ClientListener<clientToServerSignature, serverToClientSignature>, 
-			callback: serverToClientSignature
-		) -> RBXScriptConnection;
-	}
+	self = any,
+	toClientSignature = DefaultSignature,
+	toServerSignature = DefaultSignature
+> = {
+	Connect: (
+		self: self, 
+		callback: toServerSignature
+	) -> RBXScriptConnection;
+	ConnectParallel: (
+		self: self, 
+		callback: toServerSignature
+	) -> RBXScriptConnection;
+	Once: (
+		self: self, 
+		callback: toServerSignature
+	) -> RBXScriptConnection;
+}
 export type ServerFire<
-	clientToServerSignature = DefaultSignature,
-	serverToClientSignature = DefaultSignature
-	> = {
-		FireClient: PushFrontSignature<
-		any, 
-		PushFrontSignature<Player, serverToClientSignature>
-		>;
-		FireAllClients: PushFrontSignature<
-		any, 
-		serverToClientSignature
-		>;
-	}
+	self = any,
+	toClientSignature = DefaultSignature,
+	toServerSignature = DefaultSignature
+> = {
+	FireClient: AppendParameters<
+		self, 
+		AppendParameters<Player, toServerSignature>
+	>;
+	FireAllClients: AppendParameters<
+		self, 
+		toServerSignature
+	>;
+}
 export type ServerListener<
-	clientToServerSignature = DefaultSignature,
-	serverToClientSignature = DefaultSignature
-	> = {
-		Connect: (
-			self: ServerListener<clientToServerSignature, serverToClientSignature>, 
-			callback: PushFrontSignature<Player, clientToServerSignature>
-		) -> RBXScriptConnection;
-		ConnectParallel: (
-			self: ServerListener<clientToServerSignature, serverToClientSignature>, 
-			callback: PushFrontSignature<Player, clientToServerSignature>
-		) -> RBXScriptConnection;
-		Once: (
-			self: ServerListener<clientToServerSignature, serverToClientSignature>, 
-			callback: PushFrontSignature<Player, clientToServerSignature>
-		) -> RBXScriptConnection;
-	}
-
-export type Event<
-	clientToServerSignature = DefaultSignature,
-	serverToClientSignature = DefaultSignature
-	> = {
-		client: 
-		ClientFire<clientToServerSignature, serverToClientSignature>
-		& {
-			OnClientEvent: ClientListener<clientToServerSignature, serverToClientSignature>;
-		}
-		;
-		server: 
-		ServerFire<clientToServerSignature, serverToClientSignature>
-		& {
-			OnServerEvent: ServerListener<clientToServerSignature, serverToClientSignature>;
-		}
-		;
-	}
-export type PrivateEvent = {
-	_remoteEvent: RemoteEvent
+	self = any,
+	toClientSignature = DefaultSignature,
+	toServerSignature = DefaultSignature
+> = {
+	Connect: (
+		self: self, 
+		callback: AppendParameters<Player, toClientSignature>
+	) -> RBXScriptConnection;
+	ConnectParallel: (
+		self: self, 
+		callback: AppendParameters<Player, toClientSignature>
+	) -> RBXScriptConnection;
+	Once: (
+		self: self, 
+		callback: AppendParameters<Player, toClientSignature>
+	) -> RBXScriptConnection;
 }
 
-export type ClientToServer<signature = DefaultSignature> = Event<signature, any>
-export type ServerToClient<signature = DefaultSignature> = Event<any, signature>
+export type Event<
+	toClientSignature = DefaultSignature,
+	toServerSignature = DefaultSignature
+> = {
+	client:
+		ClientFire<any, toClientSignature, toServerSignature>
+		& {
+			OnClientEvent: ClientListener<any, toClientSignature, toServerSignature>;
+		};
+	server: 
+		ServerFire<any, toClientSignature, toServerSignature>
+		& {
+			OnServerEvent: ServerListener<any, toClientSignature, toServerSignature>;
+		};
+}
+
+export type ToClientEvent<signature = DefaultSignature> = Event<signature, DefaultSignature>
+export type ToServerEvent<signature = DefaultSignature> = Event<DefaultSignature, signature>
+
+--[[
+	REMOTE FUNCTIONS
+]]
+
+export type ClientInvoke<
+	self = any,
+	fromClientSignature = DefaultSignature,
+	fromServerSignature = DefaultSignature
+> = {
+	OnClientInvoke: fromClientSignature;
+	InvokeServer: ExtractParameters<
+		AppendParameters<
+			self,
+			fromServerSignature
+		>
+	>;
+}
+export type ServerInvoke<
+	self = any,
+	fromClientSignature = DefaultSignature,
+	fromServerSignature = DefaultSignature
+> = {
+	OnServerInvoke: AppendParameters<
+		Player,
+		fromServerSignature
+	>;
+	InvokeClient: ExtractParameters<
+		AppendParameters<
+			self,
+			AppendParameters<
+				Player,
+				fromClientSignature
+			>
+		>
+	>
+}
+
+export type Function<
+	fromClientSignature = DefaultSignature,
+	fromServerSignature = DefaultSignature
+> = {
+	client: ClientInvoke<any, fromClientSignature, fromServerSignature>;
+	server: ServerInvoke<any, fromClientSignature, fromServerSignature>;
+}
+
+export type FromClientFunction<signature = DefaultSignature> = Function<signature, DefaultSignature>
+export type FromServerFunction<signature = DefaultSignature> = Function<DefaultSignature, signature>
 
 return Types

@@ -1,1 +1,5 @@
 rokit.toml
+tests
+.luaurc
+sourcemap.json
+default.project.json

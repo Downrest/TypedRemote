@@ -1,7 +1,7 @@
 [package]
-name = "downrest/typedevent"
+name = "downrest/typedremote"
 version = "1.0.4"
-description = "A typed remote event wrapper, taking advantage of function types (...) -> () for typechecking parameters with names on both firing and listening."
+description = "A typed remote wrapper, taking advantage of function types (...) -> (...) for typechecking parameters"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 exclude = [
