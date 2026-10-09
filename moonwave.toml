@@ -1,23 +1,23 @@
-# title = "TypedRemote"
-# gitRepoUrl = "https://github.com/Downrest/TypedRemote"
+title = "TypedRemote"
+gitRepoUrl = "https://github.com/Downrest/TypedRemote"
 
-# gitSourceBranch = "main"
-# changelog = true
-# # classOrder = []
+gitSourceBranch = "main"
+changelog = true
+# classOrder = []
 
-# [docusaurus]
-# # onBrokenLinks = "throw"
-# # onBrokenMarkdownLinks = "warn"
+[docusaurus]
+# onBrokenLinks = "throw"
+# onBrokenMarkdownLinks = "warn"
 
-# # projectName = "TypedRemote"
-# # url = "https://AuthorName.github.io"
-# baseUrl = "/TypedRemote"
-# tagline = "Declare remote events and functions, and typecheck with function signatures () -> ()"
+# projectName = "TypedRemote"
+# url = "https://AuthorName.github.io"
+baseUrl = "/TypedRemote"
+tagline = "Declare remote events and functions, and typecheck with function signatures () -> ()"
 
-# [home]
-# enabled = true
-# includeReadme = false
+[home]
+enabled = true
+includeReadme = false
 
-# [footer]
-# style = "dark"
-# copyright = "Copyright © 2026 Downrest. Built with Moonwave and Docusaurus"
+[footer]
+style = "dark"
+copyright = "Copyright © 2026 Downrest. Built with Moonwave and Docusaurus"
