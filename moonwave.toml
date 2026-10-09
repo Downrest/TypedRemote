@@ -11,7 +11,7 @@ onBrokenMarkdownLinks = "warn"
 
 # From git:
 projectName = "TypedRemote"
-# url = "https://AuthorName.github.io"
+url = "https://AuthorName.github.io"
 baseUrl = "/TypedRemote"
 tagline = "Declare remote events and functions, and typecheck with function signatures () -> ()"
 

@@ -3,3 +3,4 @@ tests
 .luaurc
 sourcemap.json
 default.project.json
+build
