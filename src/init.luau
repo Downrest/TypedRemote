@@ -1,27 +1,29 @@
---[[
+--[=[
 	@class TypedRemote
 
-	A typed remote event wrapper, taking advantage of function types `(...) -> (...)` 
-	for typechecking parameters with names on both firing and listening.
-]]
+	A typed wrapper for `RemoteEvent` and `RemoteFunction` instances, taking advantage of function types `() -> ()` 
+	for typechecking on firing, listening, and invoking.
+]=]
 
 local RunService = game:GetService("RunService")
 
 local Types = require(script.Types)
 
-local Event = {}
+local TypedRemote = {}
 
 export type Event<
-	clientToServerSignature = Types.DefaultSignature,
-	serverToClientSignature = Types.DefaultSignature
-> = Types.Event<clientToServerSignature, serverToClientSignature>
+	toClientSignature = Types.DefaultSignature,
+	toServerSignature = Types.DefaultSignature
+> = Types.Event<toClientSignature, toServerSignature>
+
 export type ToClientEvent<signature = Types.DefaultSignature> = Types.ToClientEvent<signature>
 export type ToServerEvent<signature = Types.DefaultSignature> = Types.ToServerEvent<signature>
 
 export type Function<
-	clientToServerSignature = Types.DefaultSignature,
-	serverToClientSignature = Types.DefaultSignature
-> = Types.Function<clientToServerSignature, serverToClientSignature>
+	fromClientSignature = Types.DefaultSignature,
+	fromServerSignature = Types.DefaultSignature
+> = Types.Function<fromClientSignature, fromServerSignature>
+
 export type FromClientFunction<signature = Types.DefaultSignature> = Types.FromClientFunction<signature>
 export type FromServerFunction<signature = Types.DefaultSignature> = Types.FromServerFunction<signature>
 
@@ -69,11 +71,11 @@ local function getFunction(name: string): RemoteFunction
 end
 
 local function wrapEvent<
-	clientToServerSignature,
-	serverToClientSignature
+	toClientSignature,
+	toServerSignature
 >(
 	remoteEvent: any -- typechecker gets angry w/ methods from (RemoteEvent | UnreliableRemoteEvent) union
-): Event<clientToServerSignature, serverToClientSignature>
+): Event<toClientSignature, toServerSignature>
 	local self = {
 		client = {
 			OnClientEvent = {};
@@ -81,7 +83,7 @@ local function wrapEvent<
 		server = {
 			OnServerEvent = {};
 		};
-	}:: Event<clientToServerSignature, serverToClientSignature>
+	}:: Event<toClientSignature, toServerSignature>
 
 	if IS_SERVER then
 		-- server
@@ -142,11 +144,11 @@ local function wrapEvent<
 end
 
 local function wrapFunction<
-	clientToServerSignature,
-	serverToClientSignature
+	fromClientSignature,
+	fromServerSignature
 >(
 	remoteFunction: RemoteFunction
-): Function<clientToServerSignature, serverToClientSignature>
+): Function<fromClientSignature, fromServerSignature>
 
 	local internal = {
 		client = {};
@@ -155,7 +157,7 @@ local function wrapFunction<
 	local self = {
 		client = {};
 		server = {};
-	}:: Function<clientToServerSignature, serverToClientSignature>
+	}:: Function<fromClientSignature, fromServerSignature>
 
 	if IS_SERVER then
 		-- server
@@ -216,32 +218,74 @@ end
     RELIABLE REMOTE EVENTS
 ]]
 
---[[
-	Creates a new reliable event.
+--[=[
+	Creates an Event (reliable) object, automatically creating a RemoteEvent instance named  `remoteName`.
 
-	@param remoteName string -- Name for reliable event
-	@return Event -- Reliable event object
-]]
-function Event.newReliable<
-	clientToServerSignature,
-	serverToClientSignature
+	```lua
+	-- server
+
+	local ReliableEvent = 
+		TypedRemote.newReliableEvent("ReliableEvent")
+		:: TypedRemote.ToServerEvent<(text: string) -> ()>
+
+	ReliableEvent.server.OnServerEvent:Connect(function(player: Player, text: string)
+		foo(text)
+	end)
+	```
+	```lua
+	-- client
+
+	ReliableEvent.client:FireServer("foo")
+	```
+
+	@within TypedRemote
+	@param remoteName string -- Name for Event (reliable)
+	@return Event<toClientSignature, toServerSignature> -- Event (reliable) object
+]=]
+function TypedRemote.newReliableEvent<
+	toClientSignature,
+	toServerSignature
 >(
 	remoteName: string
-): Event<clientToServerSignature, serverToClientSignature>
+): Event<toClientSignature, toServerSignature>
 
-	return wrapEvent<<clientToServerSignature, serverToClientSignature>>(
+	return wrapEvent<<toClientSignature, toServerSignature>>(
 		getReliableEvent(remoteName)
 	)
 end
 
-function Event.wrapReliable<
-	clientToServerSignature,
-	serverToClientSignature
+--[=[
+	Creates an Event (reliable) object, using a passed RemoteEvent instance, `remoteEvent`.
+
+	```lua
+	-- server
+
+	local ReliableEvent = 
+		TypedRemote.wrapReliableEvent(Instance.new("RemoteEvent"))
+		:: TypedRemote.ToServerEvent<(text: string) -> ()>
+
+	ReliableEvent.server.OnServerEvent:Connect(function(player: Player, text: string)
+		foo(text)
+	end)
+	```
+	```lua
+	-- client
+
+	ReliableEvent.client:FireServer("foo")
+	```
+
+	@within TypedRemote
+	@param remoteEvent RemoteEvent -- RemoteEvent instance for Event (reliable) object
+	@return Event<toClientSignature, toServerSignature> -- Event (reliable) object
+]=]
+function TypedRemote.wrapReliableEvent<
+	toClientSignature,
+	toServerSignature
 >(
 	remoteEvent: RemoteEvent
-): Event<clientToServerSignature, serverToClientSignature>
+): Event<toClientSignature, toServerSignature>
 
-	return wrapEvent<<clientToServerSignature, serverToClientSignature>>(
+	return wrapEvent<<toClientSignature, toServerSignature>>(
 		remoteEvent
 	)
 end
@@ -250,26 +294,74 @@ end
     UNRELIABLE REMOTE EVENTS
 ]]
 
-function Event.newUnreliable<
-	clientToServerSignature,
-	serverToClientSignature
+--[=[
+	Creates an Event (unreliable) object, automatically creating an UnreliableRemoteEvent instance named  `unreliableRemoteName`.
+
+	```lua
+	-- server
+
+	local UnreliableEvent = 
+		TypedRemote.newUnreliableEvent("UnreliableEvent")
+		:: TypedRemote.ToServerEvent<(text: string) -> ()>
+
+	UnreliableEvent.server.OnServerEvent:Connect(function(player: Player, text: string)
+		foo(text)
+	end)
+	```
+	```lua
+	-- client
+
+	UnreliableEvent.client:FireServer("foo")
+	```
+
+	@within TypedRemote
+	@param unreliableRemoteName string -- Name for Event (unreliable)
+	@return Event<toClientSignature, toServerSignature> -- Event (unreliable) object
+]=]
+function TypedRemote.newUnreliableEvent<
+	toClientSignature,
+	toServerSignature
 >(
 	unreliableRemoteName: string
-): Event<clientToServerSignature, serverToClientSignature>
+): Event<toClientSignature, toServerSignature>
 
-	return wrapEvent<<clientToServerSignature, serverToClientSignature>>(
+	return wrapEvent<<toClientSignature, toServerSignature>>(
 		getUnreliableEvent(unreliableRemoteName)
 	)
 end
 
-function Event.wrapUnreliable<
-	clientToServerSignature,
-	serverToClientSignature
+--[=[
+	Creates an Event (unreliable) object, using a passed UnreliableRemoteEvent instance, `remoteEvent`.
+
+	```lua
+	-- server
+
+	local UnreliableEvent = 
+		TypedRemote.wrapUnreliableEvent(Instance.new("UnreliableRemoteEvent"))
+		:: TypedRemote.ToServerEvent<(text: string) -> ()>
+
+	UnreliableEvent.server.OnServerEvent:Connect(function(player: Player, text: string)
+		foo(text)
+	end)
+	```
+	```lua
+	-- client
+
+	UnreliableEvent.client:FireServer("foo")
+	```
+
+	@within TypedRemote
+	@param unreliableRemoteEvent UnreliableRemoteEvent -- UnreliableRemoteEvent instance for Event (unreliable) object
+	@return Event<toClientSignature, toServerSignature> -- Event (unreliable) object
+]=]
+function TypedRemote.wrapUnreliableEvent<
+	toClientSignature,
+	toServerSignature
 >(
 	unreliableRemoteEvent: UnreliableRemoteEvent
-): Event<clientToServerSignature, serverToClientSignature>
+): Event<toClientSignature, toServerSignature>
 
-	return wrapEvent<<clientToServerSignature, serverToClientSignature>>(
+	return wrapEvent<<toClientSignature, toServerSignature>>(
 		unreliableRemoteEvent
 	)
 end
@@ -278,28 +370,76 @@ end
 	REMOTE FUNCTIONS
 ]]
 
-function Event.newFunction<
-	clientToServerSignature,
-	serverToClientSignature
+--[=[
+	Creates an Function object, automatically creating a RemoteFunction instance named  `remoteFunctionName`.
+
+	```lua
+	-- server
+
+	local Function = 
+		TypedRemote.newFunction("Function")
+		:: TypedRemote.FromServerFunction<(text: string) -> (string)>
+
+	Function.server.OnServerInvoke = function(player: Player, text: string): string
+		return text
+	end
+	```
+	```lua
+	-- client
+
+	local text: string = Function.client:InvokeServer("foo")
+	```
+
+	@within TypedRemote
+	@param remoteFunctionName string -- Name for Function object
+	@return Event<fromClientSignature, fromServerSignature> -- Function object
+]=]
+function TypedRemote.newFunction<
+	fromClientSignature,
+	fromServerSignature
 >(
 	remoteFunctionName: string
-): Function<clientToServerSignature, serverToClientSignature>
+): Function<fromClientSignature, fromServerSignature>
 	
-	return wrapFunction<<clientToServerSignature, serverToClientSignature>>(
+	return wrapFunction<<fromClientSignature, fromServerSignature>>(
 		getFunction(remoteFunctionName)
 	)
 end
 
-function Event.wrapFunction<
-	clientToServerSignature,
-	serverToClientSignature
+--[=[
+	Creates an Function object, using a passed RemoteFunction instance, `remoteFunction`.
+
+	```lua
+	-- server
+
+	local Function = 
+		TypedRemote.wrapFunction(Instance.new("RemoteFunction"))
+		:: TypedRemote.FromServerFunction<(text: string) -> (string)>
+
+	Function.server.OnServerInvoke = function(player: Player, text: string): string
+		return text
+	end
+	```
+	```lua
+	-- client
+	
+	local text: string = Function.client:InvokeServer("foo")
+	```
+
+	@within TypedRemote
+	@param remoteFunction RemoteFunction -- RemoteFunction instance for Function object
+	@return Event<fromClientSignature, fromServerSignature> -- Function object
+]=]
+function TypedRemote.wrapFunction<
+	fromClientSignature,
+	fromServerSignature
 >(
 	remoteFunction: RemoteFunction
-): Function<clientToServerSignature, serverToClientSignature>
+): Function<fromClientSignature, fromServerSignature>
 	
-	return wrapFunction<<clientToServerSignature, serverToClientSignature>>(
+	return wrapFunction<<fromClientSignature, fromServerSignature>>(
 		remoteFunction
 	)
 end
 
-return Event
+return TypedRemote

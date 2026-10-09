@@ -3,12 +3,13 @@ gitRepoUrl = "https://github.com/Downrest/TypedRemote"
 
 gitSourceBranch = "main"
 changelog = true
-# classOrder = []
+classOrder = []
 
 [docusaurus]
-# onBrokenLinks = "throw"
-# onBrokenMarkdownLinks = "warn"
+onBrokenLinks = "throw"
+onBrokenMarkdownLinks = "warn"
 
+# From git:
 projectName = "TypedRemote"
 # url = "https://AuthorName.github.io"
 baseUrl = "/TypedRemote"

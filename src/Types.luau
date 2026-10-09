@@ -51,7 +51,7 @@ export type ClientFire<
 > = {
 	FireServer: AppendParameters<
 		self,
-		toClientSignature
+		toServerSignature
 	>;
 }
 export type ClientListener<
@@ -61,15 +61,15 @@ export type ClientListener<
 > = {
 	Connect: (
 		self: self, 
-		callback: toServerSignature
+		callback: toClientSignature
 	) -> RBXScriptConnection;
 	ConnectParallel: (
 		self: self, 
-		callback: toServerSignature
+		callback: toClientSignature
 	) -> RBXScriptConnection;
 	Once: (
 		self: self, 
-		callback: toServerSignature
+		callback: toClientSignature
 	) -> RBXScriptConnection;
 }
 export type ServerFire<
@@ -79,11 +79,11 @@ export type ServerFire<
 > = {
 	FireClient: AppendParameters<
 		self, 
-		AppendParameters<Player, toServerSignature>
+		AppendParameters<Player, toClientSignature>
 	>;
 	FireAllClients: AppendParameters<
 		self, 
-		toServerSignature
+		toClientSignature
 	>;
 }
 export type ServerListener<
@@ -93,15 +93,15 @@ export type ServerListener<
 > = {
 	Connect: (
 		self: self, 
-		callback: AppendParameters<Player, toClientSignature>
+		callback: AppendParameters<Player, toServerSignature>
 	) -> RBXScriptConnection;
 	ConnectParallel: (
 		self: self, 
-		callback: AppendParameters<Player, toClientSignature>
+		callback: AppendParameters<Player, toServerSignature>
 	) -> RBXScriptConnection;
 	Once: (
 		self: self, 
-		callback: AppendParameters<Player, toClientSignature>
+		callback: AppendParameters<Player, toServerSignature>
 	) -> RBXScriptConnection;
 }
 
@@ -134,12 +134,10 @@ export type ClientInvoke<
 	fromServerSignature = DefaultSignature
 > = {
 	OnClientInvoke: fromClientSignature;
-	InvokeServer: ExtractParameters<
-		AppendParameters<
-			self,
-			fromServerSignature
-		>
-	>;
+	InvokeServer: AppendParameters<
+		self,
+		fromServerSignature
+	>
 }
 export type ServerInvoke<
 	self = any,
@@ -150,13 +148,11 @@ export type ServerInvoke<
 		Player,
 		fromServerSignature
 	>;
-	InvokeClient: ExtractParameters<
+	InvokeClient: AppendParameters<
+		self,
 		AppendParameters<
-			self,
-			AppendParameters<
-				Player,
-				fromClientSignature
-			>
+			Player,
+			fromClientSignature
 		>
 	>
 }
