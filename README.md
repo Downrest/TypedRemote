@@ -3,7 +3,7 @@
 TypedRemote is a simple library for declaratively handling remote instances. Similar to libraries like 
 [Net](https://sleitnick.github.io/RbxUtil/api/Net/), but with the additional support for type functions. Hooray for verbose parameters / returns!
 
-> ## Info
+> ### Info
 > This is by no means, an "all-in-one" networking library. It manages remotes, but doesn't do extra work like compression, type validation, and batching.
 
 ```lua
