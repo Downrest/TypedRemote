@@ -36,7 +36,7 @@ local Event1 = ReplicatedStorage...
 ```
 If you wanted to merely change where this remote instance would be placed, you'd have to update every single line accessing that remote. With an shared `Event.luau`, all point to that same module, meaning you can just modify the path without having to change lines from scripts.
 ```lua
--- want to change what Event1 points to? go ahead, no need to change me :3
+-- want to change what `Event.Event1` points to? go ahead, no need to change me :3
 local Event1 = Event.Event1
 ```
 The same can't be said for a) changing the "Event1" name or even b) modifying the `Event.luau` path entirely. In these cases, manual find-and-replace is unavoidable, which is the same for modifying the path of a remote instance.
