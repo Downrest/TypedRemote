@@ -12,7 +12,7 @@ onBrokenMarkdownLinks = "warn"
 projectName = "TypedRemote"
 url = "https://downrest.github.io"
 baseUrl = "/TypedRemote"
-# tagline = "Declare remote events and functions, and typecheck with function signatures () -> ()"
+tagline = "A remote instance wrapper with support for type functions signatures, () -> ()."
 
 [[classOrder]]
 classes = ["TypedRemote"]
