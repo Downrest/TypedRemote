@@ -39,6 +39,7 @@ If you wanted to merely change where this remote instance would be placed, you'd
 -- want to change what Event1 points to? go ahead, no need to change me :3
 local Event1 = Event.Event1
 ```
+The same can't be said for a) changing the "Event1" name or even b) modifying the `Event.luau` path entirely. In these cases, manual find-and-replace is unavoidable, which is the same for modifying the path of a remote instance.
 
 ## Easy onboarding for networking libraries
 Shared `Event.luau` modules are standard practice when using networking libraries. 
