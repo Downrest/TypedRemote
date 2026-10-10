@@ -1,12 +1,8 @@
 [package]
 name = "downrest/typedremote"
-version = "1.0.4"
-description = "A typed remote wrapper, taking advantage of function types (...) -> (...) for typechecking parameters"
+version = "1.0.0"
+description = "Declare remote events and functions, and typecheck with function signatures () -> ()"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
-exclude = [
-    "rokit.toml",
-    "README.md"
-]
 
 [dependencies]
