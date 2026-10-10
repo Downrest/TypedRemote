@@ -1,5 +1,5 @@
 # TypedRemote
 
-Declare remote events and functions, and typecheck with function signatures () -> ().
+A remote instance wrapper with support for type functions signatures, () -> ().
 
 Read further in the [docs](https://downrest.github.io/TypedRemote/).
