@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Rationale: The Why
+# Rationale
 
 Remote events (and sometimes functions) are a crucial piece of Roblox game architecture. However, managing remote event instances adds extra considerations:
 * "Where do I put these remote instances?"
