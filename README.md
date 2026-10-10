@@ -24,4 +24,4 @@ end)
 Event.client:FireServer("foo", 3.14) 
 ```
 
-For more information, read the [docs](https://downrest.github.io/TypedRemote/).
+For more information, read the [docs (https://downrest.github.io/TypedRemote/)](https://downrest.github.io/TypedRemote/).
