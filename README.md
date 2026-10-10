@@ -23,3 +23,5 @@ end)
 -- TypeError: Expected this [3.14] to be 'boolean', but got 'number'
 Event.client:FireServer("foo", 3.14) 
 ```
+
+For more information, read the [docs](https://downrest.github.io/TypedRemote/).
